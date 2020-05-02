@@ -28,8 +28,13 @@ class ClientTest(unittest.TestCase):
              'top_bid': {'price': 127.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
         ]
 
+        price_verification = {"ABC": ("ABC", 120.48, 119.2, 119.84),
+                              "DEF": ("DEF", 127.87, 121.68, 124.775)
+                              }
+
         for quote in quotes:
-            self.assertRaises(ValueError, getDataPoint, quote)
+            result = getDataPoint(quote)
+            self.assertEqual(result, price_verification[result[0]])
 
     def test_getRatio_calculateRatio(self):
         ratio_verification = float(1.008891671884784)
@@ -43,7 +48,13 @@ class ClientTest(unittest.TestCase):
         price_a = 120.84
         price_b = 0
 
-        self.assertRaises(ZeroDivisionError, getRatio, price_a, price_b)
+        self.assertEqual(0, getRatio(price_a, price_b))
+
+    def test_getRatio_calculateRatioZeroOne(self):
+        price_a = 120.84
+        price_b = 120.84
+
+        self.assertEqual(1, getRatio(price_a, price_b))
 
 
 if __name__ == '__main__':

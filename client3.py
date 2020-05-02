@@ -39,19 +39,15 @@ def getDataPoint(quote):
     price = statistics.fmean([bid_price, ask_price])
     price_rounded = float("%.5f" % price)  # Absolute precision
 
-    # error checking
-    if bid_price > ask_price:
-        raise ValueError("Bid price should not be higher than the ask price!")
-
     return stock, bid_price, ask_price, price_rounded
 
 
 def getRatio(price_a, price_b):
     """ Get ratio of price_a and price_b """
-    if price_b == 0:
-        raise ZeroDivisionError
-
-    return price_a / float(price_b)
+    try:
+        return price_a / float(price_b)
+    except ZeroDivisionError:
+        return 0
 
 
 # Main
