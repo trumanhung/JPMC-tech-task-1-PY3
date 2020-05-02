@@ -1,0 +1,75 @@
+From dd6c2001e2e4998db3d819c03a233f5a239cd198 Mon Sep 17 00:00:00 2001
+From: Truman Hung <trumanhung@gmail.com>
+Date: Fri, 1 May 2020 22:21:51 -0700
+Subject: [PATCH] Review
+
+---
+ client3.py     | 12 ++++--------
+ client_test.py | 15 +++++++++++++--
+ 2 files changed, 17 insertions(+), 10 deletions(-)
+
+diff --git a/client3.py b/client3.py
+index 5de1e6c..66a3ace 100644
+--- a/client3.py
++++ b/client3.py
+@@ -39,19 +39,15 @@ def getDataPoint(quote):
+     price = statistics.fmean([bid_price, ask_price])
+     price_rounded = float("%.5f" % price)  # Absolute precision
+ 
+-    # error checking
+-    if bid_price > ask_price:
+-        raise ValueError("Bid price should not be higher than the ask price!")
+-
+     return stock, bid_price, ask_price, price_rounded
+ 
+ 
+ def getRatio(price_a, price_b):
+     """ Get ratio of price_a and price_b """
+-    if price_b == 0:
+-        raise ZeroDivisionError
+-
+-    return price_a / float(price_b)
++    try:
++        return price_a / float(price_b)
++    except ZeroDivisionError:
++        return 0
+ 
+ 
+ # Main
+diff --git a/client_test.py b/client_test.py
+index e07dea5..dc8396c 100644
+--- a/client_test.py
++++ b/client_test.py
+@@ -28,8 +28,13 @@ class ClientTest(unittest.TestCase):
+              'top_bid': {'price': 127.87, 'size': 81}, 'id': '0.109974697771', 'stock': 'DEF'}
+         ]
+ 
++        price_verification = {"ABC": ("ABC", 120.48, 119.2, 119.84),
++                              "DEF": ("DEF", 127.87, 121.68, 124.775)
++                              }
++
+         for quote in quotes:
+-            self.assertRaises(ValueError, getDataPoint, quote)
++            result = getDataPoint(quote)
++            self.assertEqual(result, price_verification[result[0]])
+ 
+     def test_getRatio_calculateRatio(self):
+         ratio_verification = float(1.008891671884784)
+@@ -43,7 +48,13 @@ class ClientTest(unittest.TestCase):
+         price_a = 120.84
+         price_b = 0
+ 
+-        self.assertRaises(ZeroDivisionError, getRatio, price_a, price_b)
++        self.assertEqual(0, getRatio(price_a, price_b))
++
++    def test_getRatio_calculateRatioZeroOne(self):
++        price_a = 120.84
++        price_b = 120.84
++
++        self.assertEqual(1, getRatio(price_a, price_b))
+ 
+ 
+ if __name__ == '__main__':
+-- 
+2.26.0.windows.1
+
