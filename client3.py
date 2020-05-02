@@ -37,13 +37,16 @@ def getDataPoint(quote):
     ask_price = float(quote['top_ask']['price'])
 
     price = statistics.fmean([bid_price, ask_price])
-    price_rounded = float("%.5f" % price)
+    price_rounded = float("%.5f" % price)   # Absolute precision
 
     return stock, bid_price, ask_price, price_rounded
 
 
 def getRatio(price_a, price_b):
     """ Get ratio of price_a and price_b """
+    if price_b == 0:
+        raise ZeroDivisionError
+
     return price_a / float(price_b)
 
 
@@ -56,7 +59,7 @@ if __name__ == "__main__":
 
         price_a = None
         price_b = None
-        
+
         for quote in quotes:
             print(quote)
             stock, bid_price, ask_price, price = getDataPoint(quote)
