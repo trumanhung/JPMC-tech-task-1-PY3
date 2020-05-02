@@ -37,7 +37,11 @@ def getDataPoint(quote):
     ask_price = float(quote['top_ask']['price'])
 
     price = statistics.fmean([bid_price, ask_price])
-    price_rounded = float("%.5f" % price)   # Absolute precision
+    price_rounded = float("%.5f" % price)  # Absolute precision
+
+    # error checking
+    if bid_price > ask_price:
+        raise ValueError("Bid price should not be higher than the ask price!")
 
     return stock, bid_price, ask_price, price_rounded
 
