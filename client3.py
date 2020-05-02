@@ -17,7 +17,7 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
-
+import statistics
 import urllib.request
 import time
 import json
@@ -32,19 +32,19 @@ N = 500
 
 def getDataPoint(quote):
     """ Produce all of the needed values to generate a datapoint """
-    """ ------------- Update this function ------------- """
     stock = quote['stock']
     bid_price = float(quote['top_bid']['price'])
     ask_price = float(quote['top_ask']['price'])
-    price = bid_price
-    return stock, bid_price, ask_price, price
+
+    price = statistics.fmean([bid_price, ask_price])
+    price_rounded = float("%.5f" % price)
+
+    return stock, bid_price, ask_price, price_rounded
 
 
 def getRatio(price_a, price_b):
     """ Get ratio of price_a and price_b """
-    """ ------------- Update this function ------------- """
-    """ Also create some unit tests for this function in client_test.py """
-    return 1
+    return price_a / float(price_b)
 
 
 # Main
@@ -53,11 +53,20 @@ if __name__ == "__main__":
     # Query the price once every N seconds.
     for _ in iter(range(N)):
         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
-        print(quotes)
 
-        """ ----------- Update to get the ratio --------------- """
+        price_a = None
+        price_b = None
+        
         for quote in quotes:
+            print(quote)
             stock, bid_price, ask_price, price = getDataPoint(quote)
+
+            # We assume there are two quotes in a list each time.
+            if price_a is None:
+                price_a = price
+            else:
+                price_b = price
+
             print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
 
-        print("Ratio %s" % getRatio(price, price))
+        print("Ratio %s" % getRatio(price_a, price_b))
